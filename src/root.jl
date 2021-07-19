@@ -231,6 +231,7 @@ const _leaftypeconstlookup = Dict(
                              Const.kULong64 =>UInt64,
                              Const.kDouble32 => Float32,
                              Const.kDouble =>   Float64,
+                             Const.kFloat => Float32,
                             )
 
 """
@@ -285,6 +286,9 @@ function auto_T_JaggT(branch; customstructs::Dict{String, Type})
             leaftype = _normalize_ftype(leaf.fType)
             _type = get(_leaftypeconstlookup, leaftype, nothing)
             isnothing(_type) && error("Cannot interpret type.")
+            if branch.fType == Const.kSubbranchSTLCollection
+                _type = Vector{_type}
+            end
         end
     else
         _type = primitivetype(leaf)

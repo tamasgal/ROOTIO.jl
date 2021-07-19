@@ -375,6 +375,16 @@ end
     @test 2 == length(keys(rootfile))
     @test [1.0, 2.0, 3.0] == UnROOT.array(rootfile, "TreeD/nums")
     @test [1.0, 2.0, 3.0] == UnROOT.array(rootfile, "TreeF/nums")
+
+    # issue 55
+    rootfile = ROOTFile(joinpath(SAMPLES_DIR, "cms_ntuple_wjet.root"))
+    pts1 = UnROOT.array(rootfile, "variable/met_p4/fCoordinates/fCoordinates.fPt"; raw=false)
+    pts2 = LazyTree(rootfile, "variable", [r"met_p4/fCoordinates/.*", "mll"])[!, Symbol("met_p4/fCoordinates/fCoordinates.fPt")]
+    pts3 = rootfile["variable/good_jets_p4/good_jets_p4.fCoordinates.fPt"]
+    @test 24 == length(pts1)
+    @test Float32[69.96958, 25.149912, 131.66693, 150.56802] == pts1[1:4]
+    @test pts1 == pts2
+    @test pts3[1:2] == [[454.0, 217.5, 89.5, 30.640625], [184.375, 33.28125, 32.28125, 28.46875]]
 end
 
 @testset "jagged subbranch type by leaf" begin

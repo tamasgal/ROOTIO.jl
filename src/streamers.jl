@@ -298,6 +298,7 @@ struct TObjArray
     low::Int32
     elements
 end
+Base.getindex(obj::TObjArray, index) = obj.elements[index]
 
 function unpack(io, tkey::TKey, refs::Dict{Int32, Any}, T::Type{TObjArray})
     preamble = Preamble(io, T)

@@ -58,6 +58,6 @@ struct Offsetjagg  <:JaggType  end
 function JaggType(leaf)
     # https://github.com/scikit-hep/uproot3/blob/54f5151fb7c686c3a161fbe44b9f299e482f346b/uproot3/interp/auto.py#L144
     (match(r"\[.*\]", leaf.fTitle) !== nothing) && return Nooffsetjagg
-    leaf isa TLeafElement && return Offsetjagg
+    leaf isa TLeafElement && leaf.fLenType==0 && return Offsetjagg
     return Nojagg
 end

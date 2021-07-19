@@ -182,6 +182,17 @@ DataFrames.ncol(lt::LazyTree) = length(DataFrames.index(lt))
 Base.length(lt::LazyTree) = length(innertable(lt))
 DataFrames.nrow(lt::LazyTree) = length(lt)
 
+function getbranchnamesrecursive(obj)
+    out = Vector{String}()
+    for b in obj.fBranches.elements
+        push!(out, b.fName)
+        for subname in getbranchnamesrecursive(b)
+            push!(out,"$(b.fName)/$(subname)")
+        end
+    end
+    return out
+end
+
 """
     LazyTree(f::ROOTFile, s::AbstractString, branche::Union{AbstractString, Regex})
     LazyTree(f::ROOTFile, s::AbstractString, branches::Vector{Union{AbstractString, Regex}})
@@ -217,7 +228,7 @@ function LazyTree(f::ROOTFile, s::AbstractString, branches)
     d_colidx = Dict{Symbol, Int}()
     _m(s::AbstractString) = isequal(s)
     _m(r::Regex) = Base.Fix1(occursin, r)
-    branches = mapreduce(b->filter(_m(b), keys(f[s])), ∪, branches)
+    branches = mapreduce(b->filter(_m(b), getbranchnamesrecursive(tree)), ∪, branches)
     SB = Symbol.(branches)
     for (i,b) in enumerate(SB)
         d[b] = f["$s/$b"]
